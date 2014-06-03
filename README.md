@@ -15,7 +15,15 @@ I have used PyMouse and Py Keyboard for tracking the users movements.
  - However all the actions have effect on the host system also hence this has to be avoided
  - Currently supports only for 2 PC as i couldnt figure out how to vitually extend my screen programatically
 
-Thankyou everyone...
+ToDo
+====
+ - To provide both mouse and keyboard sharing (currently have has 2 seperate files)
+ 
+ - To hook the mouse and keyboard so that 
+ 
+ - To add GUI for rollout as application 
+ 
+Thankyou everyone... Feel free to pointout corrections enhancements etc.. :D
 
 Libraries Used
 ==============
