@@ -16,23 +16,23 @@
 
 # Client program
 import socket
-from pymouse import PyMouse
+from pymouse import PyMouse, PyMouseEvent
 
 
-HOST = ''                 # Enter the IP of the remote host within Quotes
+HOST = '10.176.127.252'                 # Enter the IP of the remote host within Quotes
 
-PORT = 50007              # The same port as used by the server
+PORT = 5009              # The same port as used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((HOST, PORT))
 msg='Hi'
 s.send(msg.encode('utf-8'))
 m = PyMouse()
-ck=0
+ck={}
 while 1:
 	data=s.recv(11)
 	if data:
 		msg=repr(data)
-		#print(msg)
+		
 		if msg[len(msg)-2]=='!':
 			if(msg[0]=='b'):
 				st=2
@@ -41,7 +41,6 @@ while 1:
 			msg=msg[st:len(msg)-2]
 		else:
 			print(msg)
-			if(msg[0]=='b'):
 				st=2
 			else:
 				st=1
@@ -51,6 +50,7 @@ while 1:
 				rem_b=11-len(msg)
 				data=s.recv(rem_b)
 				msg1=repr(data)
+			if(msg[0]=='b'):
 				print(msg1)
 				msg1=msg1[1:len(msg1)-1]
 				msg=msg+msg1
@@ -60,20 +60,22 @@ while 1:
 			x=int(msg[:4])
 			y=int(msg[4+1:9])
 			m.move(x,y)
-			if not int(msg[9])==ck:
-				if ck == 0:
-					#Button Pressed
-					# 0 -> 1 signifies Press
-					if int(msg[9])==1:
+			
+			if len(msg)==10 and msg[4]==',' and not int(msg[9])==0 and not int(msg[9])>3:
+			
+				try:
+					clk = ck[int(msg[9])]
+					m.release(x,y,ck[int(msg[9])])
+					ck.pop(int(msg[9]))
+			
+				except:
+					ck[int(msg[9])]=int(msg[9])
+					try:
 						m.press(x,y,int(msg[9]))
-				else:
-					#Button Released
-					# 1-> 0 signifies release
-					if ck == 1 and int(msg[9]) == 0:
-						m.release(x,y)
-					else:
-						m.click(x,y,ck)
-				ck = int(msg[9])
+					except:
+						#Cannot Press out of bounds
+						print('Cannot Press out of bounds')
+			
 		except ValueError:
 			print (msg)
 s.close()
