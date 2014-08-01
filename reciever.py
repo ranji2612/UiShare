@@ -19,7 +19,7 @@ import socket
 from pymouse import PyMouse, PyMouseEvent
 
 
-HOST = '10.176.127.252'                 # Enter the IP of the remote host within Quotes
+HOST = '192.168.0.100'                 # Enter the IP of the remote host within Quotes
 
 PORT = 5009              # The same port as used by the server
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,7 +27,7 @@ s.connect((HOST, PORT))
 msg='Hi'
 s.send(msg.encode('utf-8'))
 m = PyMouse()
-ck={}
+ck=0
 while 1:
 	data=s.recv(11)
 	if data:
@@ -62,22 +62,31 @@ while 1:
 			y=int(msg[4+1:9])
 			m.move(x,y)
 			
-			if len(msg)==10 and msg[4]==',' and not int(msg[9])==0 and not int(msg[9])>3:
-			
+			if len(msg)==10 and msg[4]==',' and not int(msg[9])>3:
+				#Detecting a press or release here by identifying the transition of 0-1 or 1->0
+				
 				if not int(msg[9])==ck:
+					print "=========="+str(int(msg[9]))+"================="
 					if ck == 0:
 						#Button Pressed
 						# 0 -> 1 signifies Press
-						if int(msg[9])==1:
-							m.press(x,y,int(msg[9]))
+						#if int(msg[9])==1:
+						m.press(x,y,int(msg[9]))
+						ck = int(msg[9])
+						print ck,"------------------"
 					else:
 						#Button Released
 						# 1-> 0 signifies release
-						if ck == 1 and int(msg[9]) == 0:
-							m.release(x,y)
-						else:
-							m.click(x,y,ck)
-					ck = int(msg[9])
+						# When we press 
+						m.release(x,y,ck)
+						ck = 0
+						print "Released"
+						# The bottom code is for scenarios like while clicking
+						# click you also press left click.. This is not supported 
+						# currently						
+						#else:
+						#	m.click(x,y,int(msg[9]))
+					
 			
 		except ValueError:
 			print (msg)
