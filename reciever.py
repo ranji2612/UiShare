@@ -64,18 +64,20 @@ while 1:
 			
 			if len(msg)==10 and msg[4]==',' and not int(msg[9])==0 and not int(msg[9])>3:
 			
-				try:
-					clk = ck[int(msg[9])]
-					m.release(x,y,ck[int(msg[9])])
-					ck.pop(int(msg[9]))
-			
-				except:
-					ck[int(msg[9])]=int(msg[9])
-					try:
-						m.press(x,y,int(msg[9]))
-					except:
-						#Cannot Press out of bounds
-						print('Cannot Press out of bounds')
+				if not int(msg[9])==ck:
+					if ck == 0:
+						#Button Pressed
+						# 0 -> 1 signifies Press
+						if int(msg[9])==1:
+							m.press(x,y,int(msg[9]))
+					else:
+						#Button Released
+						# 1-> 0 signifies release
+						if ck == 1 and int(msg[9]) == 0:
+							m.release(x,y)
+						else:
+							m.click(x,y,ck)
+					ck = int(msg[9])
 			
 		except ValueError:
 			print (msg)
