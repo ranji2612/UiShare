@@ -41,6 +41,7 @@ while 1:
 			msg=msg[st:len(msg)-2]
 		else:
 			print(msg)
+			if(msg[0]=='b'):
 				st=2
 			else:
 				st=1
